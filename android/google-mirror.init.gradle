@@ -1,0 +1,21 @@
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+
+def googleMirror = uri('https://edgedl.me.gvt1.com/android/maven2')
+
+beforeSettings { settings ->
+    settings.pluginManagement.repositories.all { repository ->
+        if (repository instanceof MavenArtifactRepository &&
+                repository.url.toString().contains('dl.google.com')) {
+            repository.url = googleMirror
+        }
+    }
+}
+
+allprojects {
+    repositories.all { repository ->
+        if (repository instanceof MavenArtifactRepository &&
+                repository.url.toString().contains('dl.google.com')) {
+            repository.url = googleMirror
+        }
+    }
+}
