@@ -17,6 +17,7 @@ fallback when the socket is unavailable.
 - Arabic right-to-left interface
 - Dashboard for machines, AGVs, forklift, sensors, weights, and alerts
 - Six environmental sensors with temperature and humidity
+- Interactive sensor history with selectable time ranges and metrics
 - Per-device start/stop controls
 - Global stop, resume, reset, and robot charging commands
 - Online, offline, pending-command, and reconnecting states

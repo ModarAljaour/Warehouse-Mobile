@@ -175,9 +175,9 @@ class ControlScreen extends StatelessWidget {
     try {
       final message = await operation();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } on ApiException catch (error) {
       if (context.mounted) {
@@ -212,9 +212,7 @@ class ControlScreen extends StatelessWidget {
               ),
               FilledButton(
                 style: dangerous
-                    ? FilledButton.styleFrom(
-                        backgroundColor: AppColors.danger,
-                      )
+                    ? FilledButton.styleFrom(backgroundColor: AppColors.danger)
                     : null,
                 onPressed: () => Navigator.pop(dialogContext, true),
                 child: const Text('تأكيد'),
@@ -272,7 +270,10 @@ class _GlobalCommandCard extends StatelessWidget {
             Text(
               endpoint,
               textDirection: TextDirection.ltr,
-              style: TextStyle(color: color.withValues(alpha: 0.55), fontSize: 8),
+              style: TextStyle(
+                color: color.withValues(alpha: 0.55),
+                fontSize: 8,
+              ),
             ),
           ],
         ),
@@ -297,7 +298,10 @@ class _DeviceControlTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final type = textValue(device['device_type'], 'device');
-    final enabled = boolValue(device['desired_enabled'], true);
+    final enabled = boolValue(
+      device['reported_enabled'],
+      boolValue(device['desired_enabled'], true),
+    );
     final pending = boolValue(device['pending']);
     final color = enabled ? AppColors.success : AppColors.muted;
     return Card(

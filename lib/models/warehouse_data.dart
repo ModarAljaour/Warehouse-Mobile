@@ -37,6 +37,49 @@ String textValue(Object? value, [String fallback = '--']) {
   return text == null || text.isEmpty ? fallback : text;
 }
 
+class SensorHistoryPoint {
+  const SensorHistoryPoint({
+    required this.time,
+    required this.temperature,
+    required this.humidity,
+  });
+
+  factory SensorHistoryPoint.fromJson(JsonMap json) {
+    return SensorHistoryPoint(
+      time: DateTime.parse(textValue(json['time'])).toLocal(),
+      temperature: numberValue(json['temperature']),
+      humidity: numberValue(json['humidity']),
+    );
+  }
+
+  final DateTime time;
+  final double temperature;
+  final double humidity;
+}
+
+class SensorHistory {
+  const SensorHistory({
+    required this.sensorId,
+    required this.hours,
+    required this.points,
+  });
+
+  factory SensorHistory.fromJson(JsonMap json) {
+    final points =
+        asJsonList(json['data']).map(SensorHistoryPoint.fromJson).toList()
+          ..sort((left, right) => left.time.compareTo(right.time));
+    return SensorHistory(
+      sensorId: textValue(json['sensor_id']),
+      hours: numberValue(json['hours']).round(),
+      points: points,
+    );
+  }
+
+  final String sensorId;
+  final int hours;
+  final List<SensorHistoryPoint> points;
+}
+
 class WarehouseSnapshot {
   WarehouseSnapshot({
     required this.machines,

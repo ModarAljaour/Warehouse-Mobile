@@ -4,6 +4,7 @@ import '../core/app_theme.dart';
 import '../models/warehouse_data.dart';
 import '../state/warehouse_controller.dart';
 import '../widgets/warehouse_widgets.dart';
+import 'sensor_history_screen.dart';
 
 enum _SensorFilter { all, temperature, battery }
 
@@ -51,6 +52,15 @@ class _SensorsScreenState extends State<SensorsScreen> {
             progress: value / 120,
             online: boolValue(sensor['online']),
             icon: Icons.device_thermostat,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => SensorHistoryScreen(
+                  api: widget.controller.api,
+                  sensors: snapshot.environmentSensors,
+                  initialSensorId: entry.key,
+                ),
+              ),
+            ),
           ),
         );
       }
@@ -244,6 +254,7 @@ class _TelemetryCard extends StatelessWidget {
     required this.online,
     required this.icon,
     this.warning = false,
+    this.onTap,
   });
 
   final String id;
@@ -253,6 +264,7 @@ class _TelemetryCard extends StatelessWidget {
   final bool online;
   final bool warning;
   final IconData icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -267,73 +279,90 @@ class _TelemetryCard extends StatelessWidget {
               : AppColors.border,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-        child: Row(
-          children: [
-            Container(
-              width: 43,
-              height: 43,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          child: Row(
+            children: [
+              Container(
+                width: 43,
+                height: 43,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 21),
               ),
-              child: Icon(icon, color: color, size: 21),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      id.toUpperCase(),
+                      textDirection: TextDirection.ltr,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 10,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: progress.clamp(0, 1),
+                      minHeight: 5,
+                      borderRadius: BorderRadius.circular(4),
+                      color: color,
+                      backgroundColor: AppColors.border,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    id.toUpperCase(),
-                    textDirection: TextDirection.ltr,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        value,
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        online ? (warning ? 'تحذير' : 'متصل') : 'متوقف',
+                        style: TextStyle(color: color, fontSize: 9),
+                      ),
+                    ],
                   ),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                  if (onTap != null) ...[
+                    const SizedBox(width: 7),
+                    const Icon(
+                      Icons.chevron_left,
                       color: AppColors.muted,
-                      fontSize: 10,
+                      size: 18,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: progress.clamp(0, 1),
-                    minHeight: 5,
-                    borderRadius: BorderRadius.circular(4),
-                    color: color,
-                    backgroundColor: AppColors.border,
-                  ),
+                  ],
                 ],
               ),
-            ),
-            const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  value,
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  online ? (warning ? 'تحذير' : 'متصل') : 'متوقف',
-                  style: TextStyle(color: color, fontSize: 9),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

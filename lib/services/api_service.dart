@@ -53,6 +53,18 @@ class ApiService {
   Future<Map<String, JsonMap>> sensors() async =>
       asRecordMap(await _request('GET', '/api/environment-sensors'));
 
+  Future<SensorHistory> sensorHistory(
+    String sensorId, {
+    required int hours,
+    int limit = 300,
+  }) async {
+    final data = await _request(
+      'GET',
+      '/api/history/environment-sensors/$sensorId?hours=$hours&limit=$limit',
+    );
+    return SensorHistory.fromJson(asJsonMap(data));
+  }
+
   Future<Map<String, JsonMap>> devices() async =>
       asRecordMap(await _request('GET', '/api/devices'));
 
